@@ -1,4 +1,4 @@
-# Keyboard Repeater (Windows, Linux, macOS)
+# Keyboard Repeater
 
 A keyboard repeat tool that runs in the background. You can choose which keys to repeat, set the interval, and use hotkeys to start/stop. Config can be saved and loaded. Supported: **Windows**, **Ubuntu** / **Fedora** (and other Linux with X11), **macOS**.
 
@@ -89,3 +89,4 @@ On Linux/macOS you may need: `python3 keyboard_repeater.py`
 - **Windows:** If hotkeys do not work, try running as administrator.
 - **Linux:** Needs an X11 session (e.g. normal desktop). Numpad keys in the UI send the same characters as the main number row (some apps may not distinguish numpad vs main keyboard).
 - **macOS:** Grant **Accessibility** (and **Input Monitoring** if prompted) for global hotkeys and key simulation. Numpad keys in the UI use the same character/Key fallback as on Linux.
+

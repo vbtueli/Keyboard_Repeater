@@ -1,0 +1,2 @@
+# For building portable .exe (install in addition to requirements.txt)
+pyinstaller>=6.0.0

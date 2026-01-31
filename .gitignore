@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# PyInstaller
+*.manifest
+*.spec.bak
+
+# Virtual env (optional)
+venv/
+.venv/
+env/
+
+# Local upload notes (do not publish)
+CHANGELOG_UPLOAD.md
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db

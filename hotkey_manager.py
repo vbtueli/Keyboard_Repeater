@@ -48,15 +48,20 @@ class HotkeyManager:
         if self.capturing_which is not None:
             return
         try:
+            if not self.root.winfo_exists():
+                return
             name = key.name.lower() if hasattr(key, "name") else (key.char or "").lower()
         except Exception:
             return
         if not name:
             return
-        if name == self.start_hotkey:
-            self.root.after(0, self.on_start)
-        elif name == self.stop_hotkey:
-            self.root.after(0, self.on_stop)
+        try:
+            if name == self.start_hotkey and self.root.winfo_exists():
+                self.root.after(0, self.on_start)
+            elif name == self.stop_hotkey and self.root.winfo_exists():
+                self.root.after(0, self.on_stop)
+        except Exception:
+            pass
 
     def capture(self, which: str, callback):
         """Start one-shot capture; on key press call callback(which, key_name) and restart global listener."""
@@ -87,6 +92,10 @@ class HotkeyManager:
             except Exception:
                 pass
         self.capture_listener = None
-        if cb:
-            cb(which, name)
-        self.start_listener()
+        try:
+            if self.root.winfo_exists() and cb:
+                cb(which, name)
+            if self.root.winfo_exists():
+                self.start_listener()
+        except Exception:
+            pass

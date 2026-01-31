@@ -1,9 +1,18 @@
 # -*- coding: utf-8 -*-
 """Build keyboard repeater UI; attach widgets/vars to app."""
+import re
+import sys
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog
 
 from layout import MAIN_LAYOUT, NUMPAD_LAYOUT
+
+
+def _validate_interval_input(proposed: str) -> bool:
+    """Allow only numeric input (digits and at most one decimal point)."""
+    if proposed == "":
+        return True
+    return bool(re.match(r"^\d*\.?\d*$", proposed))
 
 
 def build_ui(root, app):
@@ -39,14 +48,30 @@ def build_ui(root, app):
     interval_frame = ttk.Frame(main)
     interval_frame.pack(fill=tk.X, pady=4)
     ttk.Label(interval_frame, text="Interval:", width=10, anchor=tk.W).pack(side=tk.LEFT, padx=(0, 4))
-    app.interval_var = tk.StringVar(value="1")
-    ttk.Entry(interval_frame, textvariable=app.interval_var, width=8).pack(side=tk.LEFT, padx=2)
+    app.interval_var = tk.StringVar(value="11")
+    vcmd = (root.register(_validate_interval_input), "%P")
+    interval_entry = ttk.Entry(
+        interval_frame, textvariable=app.interval_var, width=8,
+        validate="key", validatecommand=vcmd
+    )
+    interval_entry.pack(side=tk.LEFT, padx=2)
     app.unit_var = tk.StringVar(value="Seconds")
     app.unit_combo = ttk.Combobox(
         interval_frame, textvariable=app.unit_var,
         values=["Seconds", "Minutes"], state="readonly", width=10
     )
     app.unit_combo.pack(side=tk.LEFT, padx=2)
+
+    if sys.platform == "win32":
+        target_frame = ttk.Frame(main)
+        target_frame.pack(fill=tk.X, pady=4)
+        ttk.Label(target_frame, text="Target app (optional):", width=18, anchor=tk.W).pack(side=tk.LEFT, padx=(0, 4))
+        app.target_exe_var = tk.StringVar(value="")
+        target_entry = ttk.Entry(
+            target_frame, textvariable=app.target_exe_var, width=45,
+        )
+        target_entry.pack(side=tk.LEFT, padx=2, fill=tk.X, expand=True)
+        _add_browse_button(target_frame, app, root)
 
     hotkey_frame = ttk.Frame(main)
     hotkey_frame.pack(fill=tk.X, pady=4)
@@ -73,11 +98,31 @@ def build_ui(root, app):
     btn_frame.pack(fill=tk.X, pady=2)
     ttk.Button(btn_frame, text="Save as...", command=app._save_config).pack(side=tk.LEFT, padx=4)
     ttk.Button(btn_frame, text="Open config", command=app._load_config).pack(side=tk.LEFT, padx=4)
+    ttk.Button(btn_frame, text="Confirm", command=app._confirm_save_default).pack(side=tk.LEFT, padx=(28, 4))
+    ttk.Button(btn_frame, text="Clear", command=app._clear_to_defaults).pack(side=tk.LEFT, padx=4)
+    app.log_enabled_var = tk.BooleanVar(value=False)
+    ttk.Checkbutton(btn_frame, text="Enable log", variable=app.log_enabled_var).pack(side=tk.LEFT, padx=(16, 0))
+    ttk.Button(btn_frame, text="View log", command=app._view_log).pack(side=tk.LEFT, padx=4)
     app.size_hint_var = tk.StringVar(value="")
     ttk.Label(btn_frame, textvariable=app.size_hint_var, font=("Segoe UI", 9), foreground="gray").pack(side=tk.RIGHT, padx=4)
     root.bind("<Configure>", app._on_configure)
 
     app._update_hotkey_button_states()
+
+
+def _add_browse_button(parent, app, root):
+    """Add a Browse button that opens a file dialog to select an executable."""
+    if sys.platform == "win32":
+        filetypes = [("Executables", "*.exe"), ("All files", "*.*")]
+    else:
+        filetypes = [("All files", "*.*")]
+
+    def browse():
+        path = filedialog.askopenfilename(parent=root, title="Select executable", filetypes=filetypes)
+        if path:
+            app.target_exe_var.set(path)
+
+    ttk.Button(parent, text="Browse", command=browse).pack(side=tk.LEFT, padx=2)
 
 
 def _add_key_button(parent, item, app):

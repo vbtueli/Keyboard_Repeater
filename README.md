@@ -8,6 +8,18 @@ A keyboard repeat tool that runs in the background. You can choose which keys to
 2. **Interval** – Enter a number and choose **Seconds** or **Minutes**.
 3. **Hotkeys** – Default: **F9** to start, **F10** to stop. You can change them by clicking the hotkey buttons and pressing a key. Status (Stopped / Running) is shown in the window.
 4. **Save / Open config** – Save the current setup (selected keys, interval, hotkeys) to a JSON file and load it later.
+5. **Confirm** – Save current settings as default; they are loaded automatically on next startup.
+6. **Clear** – Restore all settings to default values.
+7. **Target app (Windows only)** – Optionally choose an executable; repeat will send keys to that app’s window even when another window has focus.
+8. **Enable log / View log** – Turn on logging and open a window to view the repeater log (last 500 lines, with Refresh).
+
+## Config and log file locations
+
+- **Default config** (used by Confirm and on startup):  
+  - **Windows:** `%APPDATA%\KeyboardRepeater\config.json`  
+  - **Linux / macOS:** `~/.config/KeyboardRepeater/config.json`
+- **Repeater log** (when “Enable log” is on):  
+  - Same folder as above, file `repeater_log.txt`.
 
 ## Install
 
@@ -71,7 +83,8 @@ On Linux/macOS you may need: `python3 keyboard_repeater.py`
 
 ## Notes
 
-- Repeated keys are sent to the **currently focused window**. Switch to the target app before pressing the start hotkey.
+- Without **Target app** set, repeated keys are sent to the **currently focused window**. Switch to the target app before pressing the start hotkey.
+- With **Target app** set (Windows), keys are sent to that app’s window via PostMessage, so repeat continues even when you switch to another window (e.g. to view the log).
 - Hotkeys work globally (e.g. F9/F10 work even when the app window is not focused).
 - **Windows:** If hotkeys do not work, try running as administrator.
 - **Linux:** Needs an X11 session (e.g. normal desktop). Numpad keys in the UI send the same characters as the main number row (some apps may not distinguish numpad vs main keyboard).
